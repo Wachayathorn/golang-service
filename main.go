@@ -4,9 +4,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	user_controller "github.com/wachayathorn/golang-service/controller"
+
+	database_connection "github.com/wachayathorn/golang-service/config"
 )
 
 func main() {
+	// Connect Database
+	database_connection.ConnectDatabase()
+
+	// Initialize Router
 	r := gin.Default()
 
 	r.POST("/user", user_controller.CreateUser)

@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:13.6
+    restart: always
+    environment:
+      POSTGRES_USER : 'admin'
+      POSTGRES_PASSWORD: 'P@ssw0rd'
+      POSTGRES_DB : 'golang'
+    ports:
+      - '5432:5432'
+    volumes:
+      - /Users/wachayathorn/Github/postgres-data:/var/lib/postgresql/data
+  golang-service:
+    restart: on-failure
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: P@ssw0rd
+      DB_NAME: golang
