@@ -3,14 +3,17 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
-	authentication_controller "github.com/wachayathorn/golang-service/controller"
+	user_controller "github.com/wachayathorn/golang-service/controller"
 )
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/signup", authentication_controller.SignUp)
-	r.GET("/signin", authentication_controller.SignIn)
+	r.POST("/user", user_controller.CreateUser)
+	r.GET("/user", user_controller.GetUser)
+	r.GET("/user/:id", user_controller.GetUserById)
+	r.PUT("/user/:id", user_controller.UpdateUser)
+	r.DELETE("/user/:id", user_controller.DeleteUser)
 
 	r.Run()
 }
