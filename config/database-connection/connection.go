@@ -1,7 +1,6 @@
 package database_connection
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 
@@ -9,9 +8,11 @@ import (
 	models "github.com/wachayathorn/golang-service/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/go-pg/pg/v10"
 )
 
-var PG_DB *sql.DB
+var PG_DB *pg.DB
 var GORM_DB *gorm.DB
 
 func ConnectDatabaseByPQ() {
@@ -21,12 +22,12 @@ func ConnectDatabaseByPQ() {
 	dbPassword := getEnv("DB_PASSWORD", "P@ssw0rd")
 	dbName := getEnv("DB_NAME", "golang")
 
-	connStr := fmt.Sprintf("host=%s  port=%s  user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)
-	db, err := sql.Open("postgres", connStr)
-
-	if err != nil {
-		panic("Failed to connect to database with driver")
-	}
+	db := pg.Connect(&pg.Options{
+		Addr:     fmt.Sprintf("%s:%s", dbHost, dbPort),
+		User:     dbUser,
+		Password: dbPassword,
+		Database: dbName,
+	})
 
 	PG_DB = db
 }

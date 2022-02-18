@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	database_connection "github.com/wachayathorn/golang-service/config/database-connection"
 	dto "github.com/wachayathorn/golang-service/dto"
+	models "github.com/wachayathorn/golang-service/model"
 )
 
 func SignIn(context *gin.Context) {
@@ -22,9 +23,11 @@ func SignIn(context *gin.Context) {
 		return
 	}
 
-	if user := tx.QueryRow("SELECT * FROM users WHERE username = ?", data.Username); user == nil {
+	user := models.User{}
+	if err := tx.Model(&user).Where("username = ?", data.Username).Select(); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Sign in failed"})
 		return
 	}
+
 	context.JSON(http.StatusOK, gin.H{"message": "Sign in success"})
 }
