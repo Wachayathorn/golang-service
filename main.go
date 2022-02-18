@@ -11,6 +11,7 @@ func main() {
 	// Connect Database
 	go database_connection.ConnectDatabaseByGORM()
 	go database_connection.ConnectDatabaseByPQ()
+	go database_connection.ConnectDatabaseBySQLX()
 
 	// Initialize Router
 	r := gin.Default()
@@ -23,7 +24,7 @@ func main() {
 	r.DELETE("/user/:id", controller.DeleteUser)
 
 	// Authentication Router
-	r.POST("/signin", controller.SignIn)
+	r.POST("/signin", controller.SignInBySQLX)
 
 	r.Run()
 }
