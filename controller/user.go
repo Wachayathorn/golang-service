@@ -1,4 +1,4 @@
-package user_controller
+package controller
 
 import (
 	"net/http"
@@ -9,22 +9,28 @@ import (
 
 	models "github.com/wachayathorn/golang-service/model"
 
-	database_connection "github.com/wachayathorn/golang-service/config"
+	dto "github.com/wachayathorn/golang-service/dto"
 
-	user_dto "github.com/wachayathorn/golang-service/dto"
+	database_connection "github.com/wachayathorn/golang-service/config/database-connection"
 )
 
 func CreateUser(context *gin.Context) {
-	var data user_dto.CreateUserDto
+	var data dto.CreateUserDto
 
 	if err := context.ShouldBindJSON(&data); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user := models.User{Id: strconv.FormatInt(time.Now().Unix(), 10), FirstName: data.FirstName, LastName: data.LastName}
+	tx := database_connection.GORM_DB.Begin()
 
-	tx := database_connection.DB.Begin()
+	user := models.User{}
+	if err := database_connection.GORM_DB.Where("username = ?", data.Username).First(&user).Error; err == nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Username already exist!"})
+		return
+	}
+
+	user = models.User{Id: strconv.FormatInt(time.Now().Unix(), 10), FirstName: data.FirstName, LastName: data.LastName, Username: data.Username}
 
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
@@ -38,7 +44,7 @@ func CreateUser(context *gin.Context) {
 
 func GetUser(context *gin.Context) {
 	userList := []models.User{}
-	database_connection.DB.Find(&userList)
+	database_connection.GORM_DB.Find(&userList)
 	context.JSON(http.StatusOK, userList)
 }
 
@@ -46,7 +52,7 @@ func GetUserById(context *gin.Context) {
 	id := context.Param("id")
 
 	user := models.User{}
-	if err := database_connection.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := database_connection.GORM_DB.Where("id = ?", id).First(&user).Error; err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
 		return
 	}
@@ -58,7 +64,7 @@ func UpdateUser(context *gin.Context) {
 	id := context.Param("id")
 
 	user := models.User{}
-	if err := database_connection.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := database_connection.GORM_DB.Where("id = ?", id).First(&user).Error; err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "User not found!"})
 		return
 	}
@@ -68,7 +74,7 @@ func UpdateUser(context *gin.Context) {
 		return
 	}
 
-	tx := database_connection.DB.Begin()
+	tx := database_connection.GORM_DB.Begin()
 
 	if err := tx.Save(&user).Error; err != nil {
 		tx.Rollback()
@@ -86,9 +92,9 @@ func DeleteUser(context *gin.Context) {
 
 	user := models.User{}
 
-	tx := database_connection.DB.Begin()
+	tx := database_connection.GORM_DB.Begin()
 
-	if err := database_connection.DB.Where("id = ?", id).Delete(&user).Error; err != nil {
+	if err := database_connection.GORM_DB.Where("id = ?", id).Delete(&user).Error; err != nil {
 		tx.Rollback()
 		context.JSON(http.StatusNotFound, gin.H{"error": "User not found!"})
 		return
