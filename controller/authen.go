@@ -59,9 +59,16 @@ func SignInBySQLX(context *gin.Context) {
 		return
 	}
 
-	if user := database_connection.SQLX.QueryRow("SELECT * FROM users WHERE username = ?", data.Username); user == nil {
+	tx, err := database_connection.SQLX.Begin()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if user := tx.QueryRow("SELECT * FROM users WHERE username = ?", data.Username); user == nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Sign in failed"})
 		return
 	}
+	tx.Commit()
 	context.JSON(http.StatusOK, gin.H{"message": "Sign in success"})
 }
