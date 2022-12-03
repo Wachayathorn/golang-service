@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/go-pg/pg/v10 v10.10.6
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.4
 )
 
@@ -17,7 +18,6 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.9.0 // indirect
 	github.com/jackc/pgx/v4 v4.14.0 // indirect
-	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
